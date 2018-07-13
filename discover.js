@@ -18,52 +18,69 @@ function getLikes(path, numResults, callback) {
     if (error) {
       return null;
     } else {
-      // console.log(body.data)
       return callback(body.data);
     }
   });
 }
 
-// function getDistinct(myLikes, otherLikes) {
-//   for (var i = 0; i < myLikes.length; i++) {
-//     if myLikes[i]
-//   }
-//   return distinctVids;
+// // https://stackoverflow.com/questions/20696527/get-list-of-items-in-one-list-that-are-not-in-another
+// function getDistinctArr(myLikes,otherLikes) {
+//   var distinct=otherLikes.filter(function(item){
+//     return myLikes.indexOf(item)==-1;
+//   });
+//   return distinct;
 // }
 
-function getDistinct(myLikes,otherLikes) {
+function getDistinct(myLikesObj,otherLikes) {
+  var distinct = [];
 
+  otherLikes.forEach(function(video) {
+    if (!(video in myLikesObj)) {
+      distinct.push(video.uri);
+    }
+  });
+  return distinct;
 }
 
 function main() {
   var bigUsrLst = [];
-  var newUserList = {};
+  var newVideoList = {};
 
   // get 10 videos the current user has liked
   getLikes(CUR_USER,2,function(myLikedVids){ //10
+    // create object from myLikedVids
+    myLikesObj = {}
+    myLikedVids.forEach(function(video) {
+      myLikesObj[video.uri] = true;
+    });
+
     if (myLikedVids != null) {
-      // for (var i = 0; i < myLikedVids.length; i++) {
-      //   // Create a list of 50 users who have liked the same video
-      //   getLikes(myLikedVids[i].uri,2,function(userList){ //50
-      //     if (userList != null) {
-      //       for (var i = 0; i < userList.length; i++) {
-      //         // Get list of 100 liked videos for user
-      //         getLikes(userList[i].uri,2,function(userLikedVids){ //100
-      //           if (userLikedVids != null) {
-      //             // Create a recommended videos list
-      //             newUserList.uri = Object.values(getDistinct(myLikedVids,userLikedVids));
-      //             var numMutualLikes = myLikedVids.length - newUserList.uri.length;
-      //             console.log(newUserList.uri);
-      //             console.log(numMutualLikes);
-      //             // associate(userList[i],numMutualLikes);
-      //           }
-      //         });
-      //       }
-      //       // userList = sort(userList,mutualLikes);
-      //       // bigUsrLst.append(userList)
-      //     }
-      //   });
-      // }
+      for (var i = 0; i < myLikedVids.length; i++) {
+        // Create a list of 50 users who have liked the same video
+        getLikes(myLikedVids[i].uri,2,function(userList){ //50
+          if (userList != null) {
+            for (var i = 0; i < userList.length; i++) {
+              // Get list of 100 liked videos for user
+              getLikes(userList[i].uri,2,function(userLikedVids){ //100
+                if (userLikedVids != null) {
+                  // Create a recommended videos list
+                  var distinctVids = getDistinct(myLikesObj,userLikedVids);
+                  var numMutualLikes = myLikedVids.length - distinctVids.length;
+                  if (!(numMutualLikes in newVideoList)) {
+                    newVideoList[numMutualLikes] = distinctVids;
+                  } else {
+                    newVideoList[numMutualLikes] = newVideoList[numMutualLikes].concat(distinctVids)
+                  }
+                  console.log(newVideoList);
+                  // associate(userList[i],numMutualLikes);
+                }
+              });
+            }
+            // newVideoList = sort(newVideoList,mutualLikes);
+            // bigUsrLst.append(newVideoList)
+          }
+        });
+      }
     }
     // var recList = bigUsrLst[:10].values();
   });
