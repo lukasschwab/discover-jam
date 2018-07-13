@@ -42,28 +42,28 @@ function main() {
   // get 10 videos the current user has liked
   getLikes(CUR_USER,2,function(myLikedVids){ //10
     if (myLikedVids != null) {
-      for (var i = 0; i < myLikedVids.length; i++) {
-        // Create a list of 50 users who have liked the same video
-        getLikes(myLikedVids[i].uri,2,function(userList){ //50
-          if (userList != null) {
-            for (var i = 0; i < userList.length; i++) {
-              // Get list of 100 liked videos for user
-              getLikes(userList[i].uri,2,function(userLikedVids){ //100
-                if (userLikedVids != null) {
-                  // Create a recommended videos list
-                  newUserList.uri = Object.values(getDistinct(myLikedVids,userLikedVids));
-                  var numMutualLikes = myLikedVids.length - newUserList.uri.length;
-                  console.log(newUserList.uri);
-                  console.log(numMutualLikes);
-                  // associate(userList[i],numMutualLikes);
-                }
-              });
-            }
-            // userList = sort(userList,mutualLikes);
-            // bigUsrLst.append(userList)
-          }
-        });
-      }
+      // for (var i = 0; i < myLikedVids.length; i++) {
+      //   // Create a list of 50 users who have liked the same video
+      //   getLikes(myLikedVids[i].uri,2,function(userList){ //50
+      //     if (userList != null) {
+      //       for (var i = 0; i < userList.length; i++) {
+      //         // Get list of 100 liked videos for user
+      //         getLikes(userList[i].uri,2,function(userLikedVids){ //100
+      //           if (userLikedVids != null) {
+      //             // Create a recommended videos list
+      //             newUserList.uri = Object.values(getDistinct(myLikedVids,userLikedVids));
+      //             var numMutualLikes = myLikedVids.length - newUserList.uri.length;
+      //             console.log(newUserList.uri);
+      //             console.log(numMutualLikes);
+      //             // associate(userList[i],numMutualLikes);
+      //           }
+      //         });
+      //       }
+      //       // userList = sort(userList,mutualLikes);
+      //       // bigUsrLst.append(userList)
+      //     }
+      //   });
+      // }
     }
     // var recList = bigUsrLst[:10].values();
   });
