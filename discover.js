@@ -1,8 +1,8 @@
 var Vimeo = require('vimeo').Vimeo;
 var CUR_USER = '/users/' + '3164416';
 var CLIENT_ID = "b72457b81d83ea94cb92fa281ca45026e3bc0785";
-var CLIENT_SECRET = "ACYd0wJDHHpFP8UBRutpiG6DILC7K27QdQQn/tvz9o5i5oH9zWbsglVEKkomFcwrt2DIPxpezcfNXoAmzILDYU5d5B8juO3TrXMQrVfpgCK6vk1uUro/DU7qwTgGQ1K1";
-var ACCESS_TOKEN = "cb6b2e8f14964cee9fa23f53166e9c3a";
+var CLIENT_SECRET = "";
+var ACCESS_TOKEN = "";
 var client = new Vimeo(CLIENT_ID, CLIENT_SECRET, ACCESS_TOKEN);
 
 function getLikes(path, numResults) {
@@ -35,8 +35,6 @@ function getDistinct(myLikesObj, otherLikes) {
   var distinct = [];
 
   otherLikes.forEach(function(video) {
-    // console.log(video.uri);
-    // console.log(myLikesObj);
     if (!(video.uri in myLikesObj)) {
       distinct.push(video.uri);
     }
@@ -49,8 +47,6 @@ async function main() {
 
   // get 10 videos the current user has liked
   var myLikedVids = await getLikes(CUR_USER, 2); //10
-  // console.log("my liked vids:")
-  // console.log(myLikedVids)
   // create object from myLikedVids
   myLikesObj = {}
   myLikedVids.forEach(function(video) {
@@ -81,14 +77,13 @@ async function main() {
       }
     }
   }
-  console.log(myLikedVids)
-  console.log(videoList)
 
   // Sort videoList by its user's mutual likes
   videoList = Object.keys(videoList).sort(function(a, b) {
     return videoList[b] - videoList[a];
   })
 
+  console.log(videoList)
 }
 
 main();
