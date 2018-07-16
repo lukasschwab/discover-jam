@@ -1,9 +1,13 @@
 var Vimeo = require('vimeo').Vimeo;
+var keys = require('./keys');
 var CUR_USER = '/users/' + '3164416';
-var CLIENT_ID = "b72457b81d83ea94cb92fa281ca45026e3bc0785";
-var CLIENT_SECRET = "";
-var ACCESS_TOKEN = "";
-var client = new Vimeo(CLIENT_ID, CLIENT_SECRET, ACCESS_TOKEN);
+// var CLIENT_ID = "b72457b81d83ea94cb92fa281ca45026e3bc0785";
+// var CLIENT_SECRET = "";
+// var ACCESS_TOKEN = "";
+// import {CLIENT_ID, CLIENT_SECRET, ACCESS_TOKEN} from "./keys"
+// console.log(Keys)
+
+var client = new Vimeo(keys.CLIENT_ID, keys.CLIENT_SECRET, keys.ACCESS_TOKEN);
 
 function getLikes(path, numResults) {
   return new Promise(function(resolve, reject) {
