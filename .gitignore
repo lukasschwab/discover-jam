@@ -1,5 +1,6 @@
 # No keys in git!
 keys.js
+server/secrets
 
 # Added default node .gitignore.
 # Logs
