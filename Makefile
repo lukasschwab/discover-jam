@@ -1,4 +1,4 @@
 all: run
 
 run:
-	node discover.js
+	go run server/server.go
