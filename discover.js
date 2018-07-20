@@ -1,9 +1,20 @@
 var Vimeo = require('vimeo').Vimeo;
 var keys = require('./keys');
-
+const express = require('express');
+const app = express();
 var CUR_USER = '/users/' + '3164416';
-
 var client = new Vimeo(keys.CLIENT_ID, keys.CLIENT_SECRET, keys.ACCESS_TOKEN);
+
+app.get('/', async (req, res) => {
+  const results = await main();
+  console.log(results);
+  res.send(results);
+});
+
+app.listen(3000, () => {
+  console.log('Listening on port 3000!');
+});
+
 
 function getLikes(path, numResults) {
   return new Promise(function(resolve, reject) {
@@ -46,7 +57,7 @@ async function main() {
   var videoList = {};
 
   // get 10 videos the current user has liked
-  var myLikedVids = await getLikes(CUR_USER, 2); //10
+  var myLikedVids = await getLikes(CUR_USER, 3); //10
   // create object from myLikedVids
   myLikesObj = {}
   myLikedVids.forEach(function(video) {
@@ -56,11 +67,11 @@ async function main() {
   if (myLikedVids != null) {
     for (var i = 0; i < myLikedVids.length; i++) {
       // Create a list of 50 users who have liked the same video
-      var userList = await getLikes(myLikedVids[i].uri, 2); //50
+      var userList = await getLikes(myLikedVids[i].uri, 3); //50
       if (userList != null) {
         // Get list of 100 liked videos for user
         for (var j = 0; j < userList.length; j++) {
-          var userLikedVids = await getLikes(userList[j].uri, 2); //100
+          var userLikedVids = await getLikes(userList[j].uri, 3); //100
           if (userLikedVids != null) {
             // Create a recommended videos list
             var distinctVids = await getDistinct(myLikesObj, userLikedVids);
@@ -83,7 +94,14 @@ async function main() {
     return videoList[b] - videoList[a];
   })
 
-  console.log(videoList)
+  // Get only the ten videos with most mutual likes. If fewer than ten, don't send any data.
+  if (videoList.length < 10) {
+    return [];
+  } else {
+    videoList = videoList.slice(0,10);
+    for (var i = 0; i < videoList.length; i++) {
+      videoList[i] = videoList[i].substring(videoList[i].lastIndexOf('/'))
+    }
+    return videoList;
+  }
 }
-
-main();
