@@ -1,9 +1,9 @@
 var Vimeo = require('vimeo').Vimeo;
 var keys = require('./keys');
-const express = require('express');
-const app = express();
 var CUR_USER = '/users/' + '3164416';
 var client = new Vimeo(keys.CLIENT_ID, keys.CLIENT_SECRET, keys.ACCESS_TOKEN);
+const express = require('express');
+const app = express();
 
 app.get('/', async (req, res) => {
   const results = await main();
@@ -12,7 +12,7 @@ app.get('/', async (req, res) => {
 });
 
 app.listen(3000, () => {
-  console.log('Listening on port 3000!');
+  console.log('Listening on port 3000');
 });
 
 
@@ -48,23 +48,24 @@ function getDistinct(myLikesObj, otherLikes) {
 
 async function main() {
   var videoList = {};
-  // get 10 videos the current user has liked
-  var myLikedVids = await getLikes(CUR_USER, 10); //10
+  // get all videos the current user has liked
+  var myLikedVids = await getLikes(CUR_USER, 100);
   // create object from myLikedVids
   myLikesObj = {}
   myLikedVids.forEach(function(video) {
     myLikesObj[video.uri] = true;
   });
+  // get 10 videos the current user has liked
+  var myTenLikedVids = myLikedVids.slice(0,10);
 
-  if (myLikedVids != null) {
-    for (var i = 0; i < myLikedVids.length; i++) {
-      console.log(i);
-      // Create a list of 50 users who have liked the same video
-      var userList = await getLikes(myLikedVids[i].uri, 10); //10
+  if (myTenLikedVids != null) {
+    for (var i = 0; i < myTenLikedVids.length; i++) {
+      // Create a list of 10 users who have liked the same video
+      var userList = await getLikes(myTenLikedVids[i].uri, 10);
       if (userList != null) {
-        // Get list of 100 liked videos for user
+        // Get list of 50 liked videos for user
         for (var j = 0; j < userList.length; j++) {
-          var userLikedVids = await getLikes(userList[j].uri, 50); //50
+          var userLikedVids = await getLikes(userList[j].uri, 50);
           if (userLikedVids != null) {
             // Create a recommended videos list
             var distinctVids = await getDistinct(myLikesObj, userLikedVids);
@@ -81,7 +82,6 @@ async function main() {
       }
     }
   }
-
   // Sort videoList by its user's mutual likes
   videoList = Object.keys(videoList).sort(function(a, b) {
     return videoList[b] - videoList[a];
