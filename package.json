@@ -1,0 +1,22 @@
+{
+  "name": "discoverweekly",
+  "version": "1.0.0",
+  "description": "",
+  "main": "discover.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nfeldbaum/discoverWeekly.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nfeldbaum/discoverWeekly/issues"
+  },
+  "homepage": "https://github.com/nfeldbaum/discoverWeekly#readme",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
