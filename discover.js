@@ -34,13 +34,6 @@ function getLikes(path, numResults) {
     });
   });
 }
-// // https://stackoverflow.com/questions/20696527/get-list-of-items-in-one-list-that-are-not-in-another
-// function getDistinctArr(myLikes,otherLikes) {
-//   var distinct=otherLikes.filter(function(item){
-//     return myLikes.indexOf(item)==-1;
-//   });
-//   return distinct;
-// }
 
 function getDistinct(myLikesObj, otherLikes) {
   var distinct = [];
@@ -55,9 +48,8 @@ function getDistinct(myLikesObj, otherLikes) {
 
 async function main() {
   var videoList = {};
-
   // get 10 videos the current user has liked
-  var myLikedVids = await getLikes(CUR_USER, 3); //10
+  var myLikedVids = await getLikes(CUR_USER, 10); //10
   // create object from myLikedVids
   myLikesObj = {}
   myLikedVids.forEach(function(video) {
@@ -66,12 +58,13 @@ async function main() {
 
   if (myLikedVids != null) {
     for (var i = 0; i < myLikedVids.length; i++) {
+      console.log(i);
       // Create a list of 50 users who have liked the same video
-      var userList = await getLikes(myLikedVids[i].uri, 3); //50
+      var userList = await getLikes(myLikedVids[i].uri, 10); //10
       if (userList != null) {
         // Get list of 100 liked videos for user
         for (var j = 0; j < userList.length; j++) {
-          var userLikedVids = await getLikes(userList[j].uri, 3); //100
+          var userLikedVids = await getLikes(userList[j].uri, 50); //50
           if (userLikedVids != null) {
             // Create a recommended videos list
             var distinctVids = await getDistinct(myLikesObj, userLikedVids);
@@ -100,7 +93,7 @@ async function main() {
   } else {
     videoList = videoList.slice(0,10);
     for (var i = 0; i < videoList.length; i++) {
-      videoList[i] = videoList[i].substring(videoList[i].lastIndexOf('/'))
+      videoList[i] = videoList[i].substring(videoList[i].lastIndexOf('/'));
     }
     return videoList;
   }
