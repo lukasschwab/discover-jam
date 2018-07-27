@@ -1,6 +1,6 @@
 # No keys in git!
 keys.js
-server/secrets
+go/secrets.go
 
 # Added default node .gitignore.
 # Logs
