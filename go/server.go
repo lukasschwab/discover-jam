@@ -19,6 +19,7 @@ func getRecommendationsHandler(cli Client) func(w http.ResponseWriter, r *http.R
 		if err != nil {
 			log.Print("User does not exist: ", u)
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
 			return
 		}
 		if len(out) == 0 {
@@ -39,11 +40,16 @@ func getRecommendationsHandler(cli Client) func(w http.ResponseWriter, r *http.R
 	}
 }
 
+func helloWorldHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Hello world."))
+}
+
 func main() {
 	log.Print("Serving recommendations at :8080.")
 	log.Print("API docs at https://gist.github.com/lukasschwab/948817751b4bd1ed4909fd31eb7d9fad.")
 
 	http.HandleFunc("/recommendations", getRecommendationsHandler(NewClient()))
+	// http.HandleFunc("/", helloWorldHandler)
 	// log.Fatal(http.ListenAndServe(":8080", nil))
 	appengine.Main()
 }

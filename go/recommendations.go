@@ -56,9 +56,9 @@ func (c Client) RecommendationsFor(userID string) ([]string, error) {
 		s, _ := uq.(string)
 		recs = append(recs, s)
 	}
-	// s, _ := uqs[0:10].([]string)
 
 	return recs, err
+	return defaultValues, nil
 }
 
 func (c Client) compileRecs(vid string, out chan string, wg *sync.WaitGroup) {
@@ -83,4 +83,4 @@ func (c Client) compileRecs(vid string, out chan string, wg *sync.WaitGroup) {
 	}
 }
 
-var defaultValues = []int{96431363, 270062970, 277328815, 276246978, 276103410}
+var defaultValues = []string{"96431363", "270062970", "277328815", "276246978", "276103410"}
