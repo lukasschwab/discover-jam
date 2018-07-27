@@ -42,7 +42,7 @@ func NewClient() Client {
   //       return conn, nil
   //     },
   //   },
-	// }
+	}
 }
 
 func (c Client) RecommendationsFor(userID string) ([]string, error) {
@@ -73,14 +73,17 @@ func (c Client) RecommendationsFor(userID string) ([]string, error) {
 	})
 
 	var recs []string
-	for _, uq := range uqs[0:10] {
-		s, _ := uq.(string)
-		recs = append(recs, s)
-		// TODO: filter out videos already watched.
+	i := 0
+	for len(recs) < 10 {
+		s, _ := uqs[i].(string)
+		// Don't include videos that have already been liked.
+		if !contains(vids, s) {
+			recs = append(recs, s)
+		}
+		i++
 	}
 
 	return recs, err
-	return defaultValues, nil
 }
 
 func (c Client) compileRecs(vid string, out chan string, wg *sync.WaitGroup) {
@@ -105,4 +108,11 @@ func (c Client) compileRecs(vid string, out chan string, wg *sync.WaitGroup) {
 	}
 }
 
-var defaultValues = []string{"96431363", "270062970", "277328815", "276246978", "276103410"}
+func contains(s []string, e string) bool {
+    for _, a := range s {
+        if a == e {
+            return true
+        }
+    }
+    return false
+}
