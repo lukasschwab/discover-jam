@@ -1,53 +1,47 @@
 package main
 
 import (
-  "strconv"
   "log"
+  "strings"
+
+  "github.com/silentsokolov/go-vimeo/vimeo"
 )
 
 // TODO: replace with spanner.
 
 // TODO: add mutexes.
 
-var userLikesCache map[user][]video
+var userLikesCache map[string][]string
 
-var videoFansCache map[video][]user
+var videoFansCache map[string][]string
 
-type user struct {
-  id int
-}
-
-type video struct {
-  id int
-}
-
-func (c Client) getUserLikes(userID int) []int {
-  u := user{id: userID}
-  videos, ok := userLikesCache[u]
+func (c Client) getUserLikes(userID string) ([]string, error) {
+  videos, ok := userLikesCache[userID]
   if ok {
     log.Print("Cache hit.")
+    return videos, nil
   } else {
     log.Print("Cache miss.")
-    // TODO: get videos from Vimeo.
-
-    returned, _, err := c.Users.ListLikedVideo(strconv.Itoa(userID))
-    log.Print(returned)
-    log.Print(err) // if it's a 404, report.
-
-    // Process them into []video.
-    // userLikesCache[u] = videos
+    returned, _, err := c.Users.ListLikedVideo(userID)
+    if err != nil {
+      log.Print("Error from Vimeo API: ", err)
+      return nil, err
+    }
+    out := APIFilterVideos(returned)
+    userLikesCache[userID] = out
+    return out, nil
   }
-  return toIDs(videos)
 }
 
-func toIDs(vids []video) []int {
-  var out []int
+func APIFilterVideos(vids []*vimeo.Video) []string {
+  var out []string
   if vids == nil {
-    return []int{}
+    return []string{}
   }
 
   for _, vid := range vids {
-    out = append(out, vid.id)
+    sliced := strings.Split(vid.URI, "/")
+    out = append(out, sliced[len(sliced) - 1])
   }
   return out
 }

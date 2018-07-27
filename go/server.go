@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 
 	"google.golang.org/appengine"
 )
@@ -16,26 +15,21 @@ func getRecommendationsHandler(cli Client) func(w http.ResponseWriter, r *http.R
 		w.Header().Set("Content-Type", "application/json")
 		log.Print("Handling request for user: ", u)
 
-		user, err := strconv.Atoi(u)
+		out, err := cli.RecommendationsFor(u)
 		if err != nil {
-			log.Print("Could not convert user UID: ", u)
-			w.WriteHeader(http.StatusInternalServerError)
+			log.Print("User does not exist: ", u)
+			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-
-		out, err := cli.RecommendationsFor(user)
-		if err != nil {
-			log.Print("User does not exist: ", user)
-			w.WriteHeader(http.StatusBadRequest)
-		}
 		if len(out) == 0 {
-			log.Print("No recommendations for user: ", user)
+			log.Print("No recommendations for user: ", u)
 			w.WriteHeader(http.StatusNotFound)
+			return
 		}
 
 		jsonList, err := json.Marshal(out)
 		if err != nil {
-			log.Print("Could not marshal JSON; error in recs?: ", user)
+			log.Print("Could not marshal JSON; error in recs?: ", u)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
