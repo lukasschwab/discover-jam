@@ -23,7 +23,7 @@ func (c Client) getUserLikes(userID string) ([]string, error) {
     return videos, nil
   } else {
     log.Print("User cache miss.")
-    returned, _, err := c.Users.ListLikedVideo(userID)
+    returned, _, err := c.vc.Users.ListLikedVideo(userID)
     if err != nil {
       log.Print("Error from Vimeo API: ", err)
       return nil, err
@@ -33,6 +33,8 @@ func (c Client) getUserLikes(userID string) ([]string, error) {
     return out, nil
   }
 }
+
+
 
 func APIFilterVideos(vids []*vimeo.Video) []string {
   if vids == nil {
@@ -55,7 +57,7 @@ func (c Client) getVideoFans(videoID string) ([]string, error) {
   } else {
     log.Print("Video cache miss.")
     idAsInt, _ := strconv.Atoi(videoID)
-    returned, _, err := c.Videos.LikeList(idAsInt)
+    returned, _, err := c.vc.Videos.LikeList(idAsInt)
     if err != nil {
       log.Print("Error from Vimeo API: ", err)
       return nil, err

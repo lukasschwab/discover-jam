@@ -13,6 +13,7 @@ func getRecommendationsHandler(cli Client) func(w http.ResponseWriter, r *http.R
 		u := r.Header.Get("User-Uri")
 		w.Header().Set("User-Uri", u)
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		log.Print("Handling request for user: ", u)
 
 		out, err := cli.RecommendationsFor(u)
