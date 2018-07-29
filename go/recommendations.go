@@ -1,29 +1,36 @@
 package main
 
 import (
-	"log"
-	"sync"
+	"context"
+	"net/http"
 	"sort"
+	"sync"
 
+	"github.com/ekzhu/counter"
 	"github.com/silentsokolov/go-vimeo/vimeo"
 	"golang.org/x/oauth2"
-	"github.com/ekzhu/counter"
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/log"
 )
 
 type Client struct {
-	vc *vimeo.Client
+	vc  *vimeo.Client
+	ctx context.Context
 }
 
-func NewClient() Client {
+func NewClient(r *http.Request) Client {
+	ctx := appengine.NewContext(r)
+
 	userLikesCache = make(map[string][]string)
 	videoFansCache = make(map[string][]string)
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: TOKEN},
 	)
-	tc := oauth2.NewClient(oauth2.NoContext, ts)
+	tc := oauth2.NewClient(ctx, ts)
 
 	return Client{
-		vc: vimeo.NewClient(tc, nil),
+		vc:  vimeo.NewClient(tc, nil),
+		ctx: ctx,
 	}
 }
 
@@ -50,7 +57,7 @@ func (c Client) RecommendationsFor(userID string) ([]string, error) {
 		ctr.Update(candidate)
 	}
 	uqs, freqs := ctr.Freqs()
-	sort.Slice(uqs, func (i, j int) bool {
+	sort.Slice(uqs, func(i, j int) bool {
 		return freqs[i] > freqs[j]
 	})
 
@@ -65,7 +72,7 @@ func (c Client) RecommendationsFor(userID string) ([]string, error) {
 		i++
 	}
 
-	log.Print("Done omputing recommendations.")
+	log.Infof(c.ctx, "Done computing recommendations.")
 	return recs, err
 }
 
@@ -75,8 +82,8 @@ func (c Client) compileRecs(vid string, out chan string, wg *sync.WaitGroup) {
 	if err != nil {
 		return
 	}
-	for x, fan := range(fans) {
-		log.Print("Iterating over a video's fans.")
+	for x, fan := range fans {
+		log.Infof(c.ctx, "Iterating over a video's fans.")
 		recCandidates, err := c.getUserLikes(fan)
 		if err != nil {
 			return
@@ -91,10 +98,10 @@ func (c Client) compileRecs(vid string, out chan string, wg *sync.WaitGroup) {
 }
 
 func contains(s []string, e string) bool {
-    for _, a := range s {
-        if a == e {
-            return true
-        }
-    }
-    return false
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
