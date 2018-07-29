@@ -8,12 +8,10 @@ import (
 	"github.com/silentsokolov/go-vimeo/vimeo"
 	"golang.org/x/oauth2"
 	"github.com/ekzhu/counter"
-	// "github.com/gomodule/redigo/redis"
 )
 
 type Client struct {
 	vc *vimeo.Client
-	// redisPool *redis.Pool
 }
 
 func NewClient() Client {
@@ -26,22 +24,6 @@ func NewClient() Client {
 
 	return Client{
 		vc: vimeo.NewClient(tc, nil),
-	// 	redisPool: &redis.Pool{
-  //     Dial: func() (redis.Conn, error) {
-  //       conn, err := redis.Dial("tcp", REDIS_ADDR)
-  //       if REDIS_PASS == "" {
-  //         return conn, err
-  //       }
-  //       if err != nil {
-  //         return nil, err
-  //       }
-  //       if _, err := conn.Do("AUTH", REDIS_PASS); err != nil {
-  //         conn.Close()
-  //         return nil, err
-  //       }
-  //       return conn, nil
-  //     },
-  //   },
 	}
 }
 
@@ -83,12 +65,12 @@ func (c Client) RecommendationsFor(userID string) ([]string, error) {
 		i++
 	}
 
+	log.Print("Done omputing recommendations.")
 	return recs, err
 }
 
 func (c Client) compileRecs(vid string, out chan string, wg *sync.WaitGroup) {
 	defer wg.Done()
-	log.Print("Goroutine started.")
 	fans, err := c.getVideoFans(vid)
 	if err != nil {
 		return

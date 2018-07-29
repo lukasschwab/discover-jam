@@ -6,9 +6,8 @@ import (
   "strconv"
 
   "github.com/silentsokolov/go-vimeo/vimeo"
+  "google.golang.org/appengine/memcache"
 )
-
-// TODO: replace with spanner.
 
 // TODO: add mutexes.
 
@@ -17,24 +16,33 @@ var userLikesCache map[string][]string
 var videoFansCache map[string][]string
 
 func (c Client) getUserLikes(userID string) ([]string, error) {
+  likes := getLikesFromCache(userID)
+  if likes != nil {
+    return likes, nil
+  }
+  returned, _, err := c.vc.Users.ListLikedVideo(userID)
+  if err != nil {
+    log.Print("Error from Vimeo API: ", err)
+    return nil, err
+  }
+  out := APIFilterVideos(returned)
+  setLikesInCache(userID, out)
+  return out, nil
+}
+
+func getLikesFromCache(userID string) []string {
   videos, ok := userLikesCache[userID]
   if ok {
     log.Print("User cache hit.")
-    return videos, nil
-  } else {
-    log.Print("User cache miss.")
-    returned, _, err := c.vc.Users.ListLikedVideo(userID)
-    if err != nil {
-      log.Print("Error from Vimeo API: ", err)
-      return nil, err
-    }
-    out := APIFilterVideos(returned)
-    userLikesCache[userID] = out
-    return out, nil
+    return videos
   }
+  log.Print("User cache miss.")
+  return nil
 }
 
-
+func setLikesInCache(userID string, likes []string) {
+  userLikesCache[userID] = likes
+}
 
 func APIFilterVideos(vids []*vimeo.Video) []string {
   if vids == nil {
@@ -50,22 +58,33 @@ func APIFilterVideos(vids []*vimeo.Video) []string {
 }
 
 func (c Client) getVideoFans(videoID string) ([]string, error) {
-  fans, ok := videoFansCache[videoID]
+  fans := getFansFromCache(videoID)
+  if fans != nil {
+    return fans, nil
+  }
+  idAsInt, _ := strconv.Atoi(videoID)
+  returned, _, err := c.vc.Videos.LikeList(idAsInt)
+  if err != nil {
+    log.Print("Error from Vimeo API: ", err)
+    return nil, err
+  }
+  out := APIFilterUsers(returned)
+  setFansInCache(videoID, out)
+  return out, nil
+}
+
+func getFansFromCache(videoID string) []string {
+  fans, ok := userLikesCache[videoID]
   if ok {
     log.Print("Video cache hit.")
-    return fans, nil
-  } else {
-    log.Print("Video cache miss.")
-    idAsInt, _ := strconv.Atoi(videoID)
-    returned, _, err := c.vc.Videos.LikeList(idAsInt)
-    if err != nil {
-      log.Print("Error from Vimeo API: ", err)
-      return nil, err
-    }
-    out := APIFilterUsers(returned)
-    videoFansCache[videoID] = out
-    return out, nil
+    return fans
   }
+  log.Print("Video cache miss.")
+  return nil
+}
+
+func setFansInCache(videoID string, fans []string) {
+  videoFansCache[videoID] = fans
 }
 
 func APIFilterUsers(fans []*vimeo.User) []string {
