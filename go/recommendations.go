@@ -13,6 +13,8 @@ import (
 	"google.golang.org/appengine/log"
 )
 
+const iterLimit = 5 // FIXME
+
 type Client struct {
 	vc  *vimeo.Client
 	ctx context.Context
@@ -21,8 +23,6 @@ type Client struct {
 func NewClient(r *http.Request) Client {
 	ctx := appengine.NewContext(r)
 
-	userLikesCache = make(map[string][]string)
-	videoFansCache = make(map[string][]string)
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: TOKEN},
 	)
@@ -45,7 +45,7 @@ func (c Client) RecommendationsFor(userID string) ([]string, error) {
 	for x, vid := range vids {
 		wg.Add(1)
 		go c.compileRecs(vid, out, &wg)
-		if x > 5 { // FIXME
+		if x > iterLimit {
 			break
 		}
 	}
@@ -83,7 +83,6 @@ func (c Client) compileRecs(vid string, out chan string, wg *sync.WaitGroup) {
 		return
 	}
 	for x, fan := range fans {
-		log.Infof(c.ctx, "Iterating over a video's fans.")
 		recCandidates, err := c.getUserLikes(fan)
 		if err != nil {
 			return
@@ -91,7 +90,7 @@ func (c Client) compileRecs(vid string, out chan string, wg *sync.WaitGroup) {
 		for _, r := range recCandidates {
 			out <- r
 		}
-		if x > 5 { // FIXME
+		if x > iterLimit {
 			break
 		}
 	}

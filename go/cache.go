@@ -10,14 +10,8 @@ import (
 	"google.golang.org/appengine/memcache"
 )
 
-// TODO: add mutexes.
-
-var userLikesCache map[string][]string
-
-var videoFansCache map[string][]string
-
 func (c Client) getUserLikes(userID string) ([]string, error) {
-	likes := c.getLikesFromCache(userID)
+	likes := c.cacheGet(userID)
 	if likes != nil {
 		return likes, nil
 	}
@@ -27,35 +21,8 @@ func (c Client) getUserLikes(userID string) ([]string, error) {
 		return nil, err
 	}
 	out := APIFilterVideos(returned)
-	c.setLikesInCache(userID, out)
+	c.cacheSet(userID, out)
 	return out, nil
-}
-
-func (c Client) getLikesFromCache(userID string) []string {
-	item, err := memcache.Get(c.ctx, userID)
-	if err == nil {
-		var likes []string
-		err := json.Unmarshal(item.Value, &likes)
-		if err != nil {
-			log.Errorf(c.ctx, "Error unmarshaling memcache value JSON: "+err.Error())
-			return nil
-		}
-		return likes
-	}
-	log.Warningf(c.ctx, "Could not get data from memcache: "+err.Error())
-	return nil
-}
-
-func (c Client) setLikesInCache(userID string, likes []string) {
-	// userLikesCache[userID] = likes
-	likesJSON, _ := json.Marshal(likes)
-	item := &memcache.Item{
-		Key:   userID,
-		Value: likesJSON,
-	}
-	if err := memcache.Set(c.ctx, item); err != nil {
-		log.Errorf(c.ctx, "Error writing to memcache: ", err.Error())
-	}
 }
 
 func APIFilterVideos(vids []*vimeo.Video) []string {
@@ -72,7 +39,7 @@ func APIFilterVideos(vids []*vimeo.Video) []string {
 }
 
 func (c Client) getVideoFans(videoID string) ([]string, error) {
-	fans := c.getFansFromCache(videoID)
+	fans := c.cacheGet(videoID)
 	if fans != nil {
 		return fans, nil
 	}
@@ -83,22 +50,34 @@ func (c Client) getVideoFans(videoID string) ([]string, error) {
 		return nil, err
 	}
 	out := APIFilterUsers(returned)
-	c.setFansInCache(videoID, out)
+	c.cacheSet(videoID, out)
 	return out, nil
 }
 
-func (c Client) getFansFromCache(videoID string) []string {
-	fans, ok := userLikesCache[videoID]
-	if ok {
-		log.Infof(c.ctx, "Video cache hit.")
-		return fans
+func (c Client) cacheGet(id string) []string {
+	item, err := memcache.Get(c.ctx, id)
+	if err == nil {
+		var likes []string
+		err := json.Unmarshal(item.Value, &likes)
+		if err != nil {
+			log.Errorf(c.ctx, "Error unmarshaling memcache value JSON: "+err.Error())
+			return nil
+		}
+		return likes
 	}
-	log.Infof(c.ctx, "Video cache miss.")
+	log.Warningf(c.ctx, "Could not get data from memcache: "+err.Error())
 	return nil
 }
 
-func (c Client) setFansInCache(videoID string, fans []string) {
-	videoFansCache[videoID] = fans
+func (c Client) cacheSet(id string, value []string) {
+	valueJSON, _ := json.Marshal(value)
+	item := &memcache.Item{
+		Key:   id,
+		Value: valueJSON,
+	}
+	if err := memcache.Set(c.ctx, item); err != nil {
+		log.Errorf(c.ctx, "Error writing to memcache: ", err.Error())
+	}
 }
 
 func APIFilterUsers(fans []*vimeo.User) []string {
