@@ -63,7 +63,7 @@ func (c Client) RecommendationsFor(userID string) ([]string, error) {
 
 	var recs []string
 	i := 0
-	for len(recs) < 10 {
+	for len(recs) < 10 && i < len(uqs) {
 		s, _ := uqs[i].(string)
 		// Don't include videos that have already been liked.
 		if !contains(vids, s) {

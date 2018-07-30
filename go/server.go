@@ -15,6 +15,7 @@ func recommendationsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("User-Uri", u)
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET")
 	log.Print("Handling request for user: ", u)
 
 	out, err := cli.RecommendationsFor(u)
@@ -41,6 +42,17 @@ func recommendationsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonList)
 }
 
+func corsHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+  case "OPTIONS":
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET")
+		w.Header().Set("Access-Control-Allow-Headers", "User-Uri")
+  case "GET":
+		recommendationsHandler(w, r)
+  }
+}
+
 func helloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello world."))
 }
@@ -49,6 +61,6 @@ func main() {
 	log.Print("Serving recommendations at :8080.")
 	log.Print("API docs at https://gist.github.com/lukasschwab/948817751b4bd1ed4909fd31eb7d9fad.")
 
-	http.HandleFunc("/recommendations", recommendationsHandler)
+	http.HandleFunc("/recommendations", corsHandler)
 	appengine.Main()
 }
