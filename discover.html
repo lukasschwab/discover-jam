@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Discover Weekly</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
+    </script>
+</head>
+<body>
+    <script>
+    function embedVideo(video) {
+      var parent = document.getElementById("embed");
+      var newElement = document.createElement("div");
+      newElement.innerHTML = unescape(video.html);
+      parent.appendChild(newElement);
+    }
+    $(function() {
+        $.ajax({
+            url: "https://vimeo-intern-hackathon.appspot.com/recommendations",
+            headers: {"User-Uri": "56231920"},
+            method: 'GET',
+            success: function(result) {
+              function init(urls) {
+                urls.forEach(function (url) {
+                  var js = document.createElement('script');
+                  js.setAttribute('type', 'text/javascript');
+                  js.setAttribute('src', url);
+                  document.getElementsByTagName('head').item(0).appendChild(js);
+                });
+              }
+              var displayVideos = [];
+              result.forEach(videoId => {
+                var videoUrl = 'http://www.vimeo.com/' + videoId;
+                var endpoint = 'https://www.vimeo.com/api/oembed.json';
+                var callback = 'embedVideo';
+                var finalUrl = endpoint + '?url=' + encodeURIComponent(videoUrl) + '&callback=' + callback + '&width=640';
+                displayVideos.push(finalUrl);
+              });
+              window.onload = init(displayVideos);
+            },
+            error: function(xhr) {
+              console.log('error');
+            },
+        });
+      });
+    </script>
+
+    <h1>Discover Weekly</h1>
+    <div id="embed"></div>
+</body>
+</html>
