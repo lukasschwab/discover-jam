@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Discover Weekly</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
+    var results = "";
+    var videos = [96431363, 270062970, 277328815, 276246978, 276103410];
+
+    var thumbnail_urls = [];
+
+    $.get("https://vimeo.com/api/oembed.json?url=https%3A%2F%2Fvimeo.com%2" + videoId, function(data) {
+      console.log(data.thumbnail_url);
+      $('#thumbnail_url').attr('src', data.thumbnail_url);
+    });
+
+    for () {
+      var a = $("<a href='' />");
+      var image = $("<img src='" + + "' />")
+      a.append(image);
+      $('#thumbnails').append(a);
+    }
+  </script>
+</head>
+<body>
+
+
+<div id="thumbnails">
+
+</div>
+
+<script>
+  $(function() {
+
+      ///////
+
+  });
+</script>
+
+</body>
+</html>
