@@ -1,52 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Discover Weekly</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
-    </script>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vimeo Discover Weekly</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <script src="js/bootstrap.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <style>
+    .grid-container {
+      display: grid;
+      grid-gap: 20px;
+      grid-template-columns: auto auto;
+      padding: 20px;
+    }
+    .grid-item {
+      text-align: center;
+    }
+    .header {
+      text-align: center;
+      margin-top: 50px;
+      margin-bottom: 30px;
+    }
+  </style>
 </head>
 <body>
-    <script>
+  <script>
     function embedVideo(video) {
       var parent = document.getElementById("embed");
       var newElement = document.createElement("div");
+      newElement.className = 'grid-item';
       newElement.innerHTML = unescape(video.html);
       parent.appendChild(newElement);
     }
     $(function() {
-        $.ajax({
-            url: "https://vimeo-intern-hackathon.appspot.com/recommendations",
-            headers: {"User-Uri": "56231920"},
-            method: 'GET',
-            dataType: 'json',
-            success: function(result) {
-              function init(urls) {
-                urls.forEach(function (url) {
-                  var js = document.createElement('script');
-                  js.setAttribute('type', 'text/javascript');
-                  js.setAttribute('src', url);
-                  document.getElementsByTagName('head').item(0).appendChild(js);
-                });
-              }
-              var displayVideos = [];
-              result.forEach(videoId => {
-                var videoUrl = 'http://www.vimeo.com/' + videoId;
-                var endpoint = 'https://www.vimeo.com/api/oembed.json';
-                var callback = 'embedVideo';
-                var finalUrl = endpoint + '?url=' + encodeURIComponent(videoUrl) + '&callback=' + callback + '&width=640';
-                displayVideos.push(finalUrl);
-              });
-              window.onload = init(displayVideos);
-            },
-            error: function(xhr) {
-              console.log('error');
-            },
-        });
+      $.ajax({
+        url: "https://vimeo-intern-hackathon.appspot.com/recommendations",
+        headers: {"User-Uri": "56231920"},
+        method: 'GET',
+        dataType: 'json',
+        success: function(result) {
+          function init(urls) {
+            urls.forEach(function (url) {
+              var js = document.createElement('script');
+              js.setAttribute('type', 'text/javascript');
+              js.setAttribute('src', url);
+              document.getElementsByTagName('head').item(0).appendChild(js);
+            });
+          }
+          var displayVideos = [];
+          result.forEach(videoId => {
+            var videoUrl = 'http://www.vimeo.com/' + videoId;
+            var endpoint = 'https://www.vimeo.com/api/oembed.json';
+            var callback = 'embedVideo';
+            var finalUrl = endpoint + '?url=' + encodeURIComponent(videoUrl) + '&callback=' + callback + '&width=640';
+            displayVideos.push(finalUrl);
+          });
+          window.onload = init(displayVideos);
+        },
+        error: function(xhr) {
+          console.log('error');
+        },
       });
-    </script>
-
+    });
+  </script>
+  <div class="header">
     <h1>Discover Weekly</h1>
-    <div id="embed"></div>
+  </div>
+  <div id="embed" class="grid-container">
+  </div>
+  <script src="js/bootstrap.min.js"></script>
 </body>
 </html>
