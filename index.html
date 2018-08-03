@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
   <!-- Optional theme -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+<!--   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous"> -->
 
   <!-- Latest compiled and minified JavaScript -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -18,22 +18,35 @@
 
   <style>
     .grid-container {
-      display: grid;
+      display: flex grid;
       grid-gap: 20px;
       grid-template-columns: auto auto;
       padding: 20px;
     }
+    h1 {
+      font-size: 4.5rem !important;
+    }
     .grid-item {
       text-align: center;
+      margin-bottom: 30px;
     }
     .header {
       text-align: center;
       margin-top: 50px;
-      margin-bottom: 30px;
+      padding-bottom: 50px;
     }
     #loading {
         /* visibility:hidden; */
         position: absolute; width: 100%; height: 100%; background: url('spinner.gif') no-repeat top center;
+    }
+    .form-control-lg {
+      width: 202px !important;
+      height: 40px !important;
+    }
+
+    .btn-primary {
+      width: 56px !important;
+      height: 41px !important;
     }
 
   </style>
@@ -93,8 +106,8 @@
   </script>
   <div class="header">
     <h1>DiscoverJam</h1>
-    <input type="text" name="user_id" value="" placeholder="Insert User ID" id="user_id">
-    <button onclick="getVideoRecs()">submit</button>
+    <input class="form-control-lg" type="text" name="user_id" value="" placeholder="Enter User ID" id="user_id">
+    <button onclick="getVideoRecs()" type="button" class="btn btn-primary btn-lg">Go!</button>
   </div>
   <div id="loading"></div>
   <div id="embed" class="grid-container">
