@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/nfeldbaum/discoverWeekly#readme",
   "dependencies": {
-    "bootstrap": "^3.3.7",
+    "bootstrap": "^3.4.1",
     "express": "^4.16.3"
   }
 }
